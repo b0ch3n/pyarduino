@@ -3,6 +3,7 @@ __author__ = 'CAD'
 
 from enum import Enum, unique
 
+
 @unique
 class ConnectionStatus(Enum):
     Closed = "Connection closed!"
