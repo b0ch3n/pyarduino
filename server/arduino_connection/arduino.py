@@ -16,7 +16,12 @@ class ArduinoConnection(ConnectionBase):
         print("Opened connection for {}, {} , on port: ".format(self.connectionType, self.board, self.portName))
 
     def close_connection(self):
-        return NotImplemented
+        if self.connectionStatus == ConnectionStatus.Closed:
+            print("Connection is already closed!")
+        else:
+            self.connectionStatus = ConnectionStatus.Closed
+            print("Connection closed!")
+
 
 
 

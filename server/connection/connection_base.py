@@ -4,7 +4,7 @@ __author__ = 'CAD'
 from abc import ABCMeta, abstractmethod
 from server.connection.connection_enums import ConnectionStatus
 
-class ConnectionBase(metaclass=ABCMeta, object):
+class ConnectionBase(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self):
         self._connectionType = "UNDEFINED"
