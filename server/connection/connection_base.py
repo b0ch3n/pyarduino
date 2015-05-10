@@ -4,14 +4,13 @@ __author__ = 'CAD'
 from abc import ABCMeta, abstractmethod
 from server.connection.connection_enums import ConnectionStatus
 
-
-class Connection(metaclass=ABCMeta, object):
+class ConnectionBase(metaclass=ABCMeta, object):
     @abstractmethod
     def __init__(self):
         self._connectionType = "UNDEFINED"
         self._connectionStatus = ConnectionStatus.Closed
         self._portName = "UNDEFINED"
-
+        self._board = None
 
     @abstractmethod
     def open_connection(self):
@@ -33,7 +32,7 @@ class Connection(metaclass=ABCMeta, object):
     def connectionStatus(self):
         return self._connectionStatus
 
-    @name.setter
+    @connectionStatus.setter
     def connectionStatus(self, value):
         self._connectionStatus = value
 
@@ -44,4 +43,12 @@ class Connection(metaclass=ABCMeta, object):
     @portName.setter
     def portName(self, value):
         self._portName = value
+
+    @property
+    def board(self):
+        return self._board
+
+    @portName.setter
+    def board(self, value):
+        self._board = value
 
