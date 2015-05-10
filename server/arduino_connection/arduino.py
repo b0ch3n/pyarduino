@@ -3,6 +3,7 @@ __author__ = 'Mateusz'
 from ..connection.connection_base import ConnectionBase
 from ..connection.connection_enums import ConnectionStatus
 from pyfirmata import Arduino, util
+import serial
 
 class ArduinoConnection(ConnectionBase):
     def __init__(self, connection_type, port_name):
@@ -12,11 +13,20 @@ class ArduinoConnection(ConnectionBase):
         self.portName = port_name
 
     def open_connection(self):
-        self.board = Arduino(self.portName)
+        try:
+            self.board = Arduino(self.portName)
+        except serial.SerialException as e:
+            print(e.args[0])
+            return None
         print("Opened connection for {}, {} , on port: ".format(self.connectionType, self.board, self.portName))
 
     def close_connection(self):
-        return NotImplemented
+        if self.connectionStatus == ConnectionStatus.Closed:
+            print("Connection is already closed!")
+        else:
+            self.connectionStatus = ConnectionStatus.Closed
+            print("Connection closed!")
+
 
 
 
