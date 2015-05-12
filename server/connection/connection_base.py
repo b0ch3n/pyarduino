@@ -48,7 +48,7 @@ class ConnectionBase(metaclass=ABCMeta):
     def board(self):
         return self._board
 
-    @portName.setter
+    @board.setter
     def board(self, value):
         self._board = value
 
