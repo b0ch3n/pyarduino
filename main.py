@@ -20,7 +20,8 @@ ar1.open_connection()
 ardFact = ArduinoReporterFactory()
 ardRep = ardFact.get_reporter()
 
-
-ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUno"), ar1)
+for x in range(0, 10):
+    ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUnoTest"), ar1)
+    ar1.board.pass_time(1)
 
 ar1.close_connection()
