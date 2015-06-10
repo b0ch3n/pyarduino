@@ -10,6 +10,7 @@ from time import *
 import struct
 import binascii
 import uuid
+import threading
 
 print("SERVER PART OF PYARDUINO PROJECT")
 
@@ -23,19 +24,24 @@ except:
     print("Some error occurred...")
     raise SystemExit
 
-def clientThread(conn):
+def clientThread(conn, lock):
+    user_id = uuid.uuid4()
+    while user_id in connected_clients:
+        user_id =uuid.uuid4()
+    connected_clients.append(user_id)
+    print("Uruchomiono wątek dla klienta o id: " + str(user_id))
     while True:
-        user_id = uuid.uuid4()
-        while user_id in connected_clients:
-            user_id =uuid.uuid4()
-        connected_clients.append(user_id)
         data = conn.recv(1024)
-        print("Uruchomiono wątek dla klienta o id: " + user_id)
         if not data:
             break
-        print(data)
-        reply = 'chuj'
-        conn.sendall(reply.encode())
+        print("Odebrane dane od klienta o id:" + str(user_id) + " : " + data.decode())
+        with lock:
+            try:
+                voltage = str(ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUnoTest"), ar1))
+                conn.sendall(voltage.encode())
+            except:
+                conn.sendall("ERROR".encode())
+    print("Zamykanie polaczenia z klientem o id: " + str(user_id))
     connected_clients.remove(user_id)
     conn.close()
 
@@ -44,12 +50,15 @@ def clientThread(conn):
 s = socket(AF_INET, SOCK_STREAM)
 s.bind(('', 8888))
 s.listen(5)
+lock = threading.Lock()
 
 while 1:
     print("Awaiting for client...")
     client, addr = s.accept()
     print("Polaczenie z {}".format(addr))
-    start_new_thread(clientThread, (client,))
+    cThread = threading.Thread(target=clientThread, args=(client, lock))
+    cThread.start()
+
     #volt = ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUnoTest"), ar1)
     #v = str(volt)
     #print(v)

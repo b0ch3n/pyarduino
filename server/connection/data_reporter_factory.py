@@ -29,6 +29,9 @@ class ArduinoReporter(Reporter):
             else:
                 val = float(val)*5.0
           #print("Pin %s-%i : %f" % (key, value, val))
+
+            connection.board.analog[value].disable_reporting()
+
             return val
            # connection.board.pass_time(1)
 
