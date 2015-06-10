@@ -35,7 +35,7 @@ class ArduinoConnection(ConnectionBase):
             print(e.args[0])
             if self.board is not None:
                 self.board.exit()
-            return None
+            raise SystemExit
 
     def close_connection(self):
         if self.connectionStatus == ConnectionStatus.Closed:

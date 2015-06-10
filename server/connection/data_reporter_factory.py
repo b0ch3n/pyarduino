@@ -3,7 +3,6 @@ __author__ = 'Mateusz'
 
 from abc import ABCMeta, abstractmethod
 
-
 class DataReporterFactory(metaclass=ABCMeta):
     @abstractmethod
     def get_reporter(self):
@@ -29,8 +28,9 @@ class ArduinoReporter(Reporter):
                 val = 0.0
             else:
                 val = float(val)*5.0
-            print("Pin %s-%i : %f" % (key, value, val))
-            connection.board.pass_time(1)
+          #print("Pin %s-%i : %f" % (key, value, val))
+            return val
+           # connection.board.pass_time(1)
 
 
 def get_pins_dictionary(board_type):
