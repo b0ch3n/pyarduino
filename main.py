@@ -31,7 +31,7 @@ def clientThread(conn, lock):
     connected_clients.append(user_id)
     print("Uruchomiono wątek dla klienta o id: " + str(user_id))
     while True:
-        data = conn.recv(1024)
+        data = conn.recv(32)
         if not data:
             break
         print("Odebrane dane od klienta o id:" + str(user_id) + " : " + data.decode())
