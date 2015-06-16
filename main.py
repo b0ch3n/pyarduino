@@ -38,6 +38,8 @@ def clientThread(conn, lock):
         with lock:
             try:
                 voltage = str(ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUnoTest"), ar1))
+                print('Wysylam:')
+                print(voltage)
                 conn.sendall(voltage.encode())
             except:
                 conn.sendall("ERROR".encode())
@@ -51,7 +53,8 @@ s = socket(AF_INET, SOCK_STREAM)
 s.bind(('', 8888))
 s.listen(5)
 lock = threading.Lock()
-
+voltage = str(ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUnoTest"), ar1))
+print(voltage)
 while 1:
     print("Awaiting for client...")
     client, addr = s.accept()
@@ -59,17 +62,6 @@ while 1:
     cThread = threading.Thread(target=clientThread, args=(client, lock))
     cThread.start()
 
-    #volt = ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUnoTest"), ar1)
-    #v = str(volt)
-    #print(v)
-    #client.send(v.encode()) # wyslanie danych do klienta
+
 client.close()
-
-
-
-'''
-for x in range(0, 10):
-    ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUnoTest"), ar1)
-    ar1.board.pass_time(1)
-'''
 ar1.close_connection()

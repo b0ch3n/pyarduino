@@ -2,6 +2,7 @@ __author__ = 'Mateusz'
 # -*- coding: utf-8 -*-
 
 from abc import ABCMeta, abstractmethod
+import time
 
 class DataReporterFactory(metaclass=ABCMeta):
     @abstractmethod
@@ -23,13 +24,11 @@ class ArduinoReporter(Reporter):
         for key, value in dict["ANALOG"].items():
             connection.board.analog[value].enable_reporting()
         for key, value in dict["ANALOG"].items():
-            val = connection.board.analog[value].read()
-            if val is None:
-                val = 0.0
-            else:
-                val = float(val)*5.0
-          #print("Pin %s-%i : %f" % (key, value, val))
-
+            val = None
+            while(val == None):
+                time.sleep(1)
+                val = connection.board.analog[0].read()
+            val = float(val)*5.0
             connection.board.analog[value].disable_reporting()
 
             return val
