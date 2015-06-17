@@ -31,18 +31,22 @@ def clientThread(conn, lock):
     connected_clients.append(user_id)
     print("Uruchomiono wątek dla klienta o id: " + str(user_id))
     while True:
-        data = conn.recv(32)
-        if not data:
+        try:
+            data = conn.recv(32)
+            if not data:
+                break
+            print("Odebrane dane od klienta o id:" + str(user_id) + " : " + data.decode())
+            with lock:
+                try:
+                    voltage = str(ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUnoTest"), ar1))
+                    print('Wysylam:')
+                    print(voltage)
+                    conn.sendall(voltage.encode())
+                except:
+                    conn.sendall("ERROR".encode())
+        except ConnectionResetError:
+            print("Polaczenie zerwane...")
             break
-        print("Odebrane dane od klienta o id:" + str(user_id) + " : " + data.decode())
-        with lock:
-            try:
-                voltage = str(ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUnoTest"), ar1))
-                print('Wysylam:')
-                print(voltage)
-                conn.sendall(voltage.encode())
-            except:
-                conn.sendall("ERROR".encode())
     print("Zamykanie polaczenia z klientem o id: " + str(user_id))
     connected_clients.remove(user_id)
     conn.close()
@@ -53,8 +57,7 @@ s = socket(AF_INET, SOCK_STREAM)
 s.bind(('', 8888))
 s.listen(5)
 lock = threading.Lock()
-voltage = str(ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUnoTest"), ar1))
-print(voltage)
+
 while 1:
     print("Awaiting for client...")
     client, addr = s.accept()
