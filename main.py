@@ -35,7 +35,7 @@ def clientThread(conn, lock):
             data = conn.recv(32)
             if not data:
                 break
-            print("Odebrane dane od klienta o id:" + str(user_id) + " : " + data.decode())
+            print("Odebrana komenda od klienta o id:" + str(user_id) + " : " + data.decode())
             with lock:
                 try:
                     voltage = str(ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUnoTest"), ar1))
