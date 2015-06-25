@@ -5,6 +5,7 @@ from server.arduino_connection import arduino
 from server.connection.data_reporter_factory import get_pins_dictionary
 from server.connection.data_reporter_factory import ArduinoReporterFactory
 from socket import *
+from helpers.CommandsHelper.commands_helpers import  commands_extractor, InvalidCommandException, Commands
 from _thread import *
 from time import *
 import struct
@@ -32,17 +33,18 @@ def clientThread(conn, lock):
     print("Uruchomiono wątek dla klienta o id: " + str(user_id))
     while True:
         try:
-            data = conn.recv(32)
+            data = conn.recv(64)
             if not data:
                 break
-            print("Odebrana komenda od klienta o id:" + str(user_id) + " : " + data.decode())
-            with lock:
-                try:
-                    voltage = str(ardRep.get_data_for_pins(get_pins_dictionary("ArduinoUnoTest"), ar1))
+            print("Odebrane komendy od klienta o id:" + str(user_id) + " : " + data.decode())
+            #with lock:
+            try:
+                    commands_params_dict = commands_extractor(data.decode())
+                    response = str(ardRep.get_data_for_pins(commands_params_dict, ar1))
                     print('Wysylam:')
-                    print(voltage)
-                    conn.sendall(voltage.encode())
-                except:
+                    print(response)
+                    conn.sendall(response.encode())
+            except:
                     conn.sendall("ERROR".encode())
         except ConnectionResetError:
             print("Polaczenie zerwane...")

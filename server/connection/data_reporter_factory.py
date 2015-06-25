@@ -3,6 +3,7 @@ __author__ = 'Mateusz'
 
 from abc import ABCMeta, abstractmethod
 import time
+from helpers.CommandsHelper.commands_helpers import Commands
 
 class DataReporterFactory(metaclass=ABCMeta):
     @abstractmethod
@@ -16,23 +17,42 @@ class ArduinoReporterFactory(DataReporterFactory):
 
 class Reporter(metaclass=ABCMeta):
     @abstractmethod
-    def get_data_for_pins(self, dict, connection):
+    def get_data_for_pins(self, com_par_dict, connection):
         return NotImplemented
 
 class ArduinoReporter(Reporter):
-    def get_data_for_pins(self, dict , connection):
-        for key, value in dict["ANALOG"].items():
-            connection.board.analog[value].enable_reporting()
-        for key, value in dict["ANALOG"].items():
-            val = None
-            while(val == None):
-                time.sleep(1)
-                val = connection.board.analog[0].read()
-            val = float(val)*5.0
-            connection.board.analog[value].disable_reporting()
+    def get_data_for_pins(self, com_par_dict, connection):
 
-            return val
-           # connection.board.pass_time(1)
+        response = '$$'
+        print("ArduinoReporter method...")
+        print(com_par_dict)
+        print("iterator:")
+        for item in com_par_dict:
+            print(item[0])
+            if item[0] == Commands.GET_ANALOG_VAL.value:
+                pin = int(item[1])
+                connection.board.analog[pin].enable_reporting()
+                val = None
+                while val == None:
+                   # time.sleep(0.5)
+                    val = connection.board.analog[pin].read()
+                    connection.board.analog[pin].disable_reporting()
+                val = str(float(val)*5.0)
+                val = val[:5]
+                response = response + str(val) + "$$"
+                print(response)
+
+
+            elif item[0] == Commands.GET_DIGITAL_VAL.value:
+                pin = int(item[1])
+                connection.board.digital[pin].enable_reporting()
+                val = 0
+                val = connection.board.digital[pin].read()
+                connection.board.digital[pin].disable_reporting()
+                val = float(val)
+                response = response + str(val) + "$$"
+                print(response)
+        return response
 
 
 def get_pins_dictionary(board_type):
